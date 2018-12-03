@@ -9,32 +9,26 @@ extern crate rocket_crud;
 
 use self::rocket_crud::*;
 use self::models::*;
-use rocket::http::RawStr;
 use rocket_contrib::databases::diesel;
 use rocket_contrib::json::Json;
 
 #[database("my_db")]
 struct MyDatabase(diesel::MysqlConnection);
 
-#[get("/hello/<name>")]
-fn hello(name: &RawStr) -> String {
-    format!("Hello {}, from rocket!", name.as_str())
-}
-
-#[get("/fuel")]
-fn fuel() -> &'static str {
-    "Rusty rocket fueled by diesel!"
-}
-
-#[get("/measure")]
-fn measure(conn: MyDatabase) -> Json<Vec<Measurement>> {
+#[get("/measure/all")]
+fn all(conn: MyDatabase) -> Json<Vec<Measurement>> {
     let v = Measurement::all(&conn);
     Json(v)
+}
+
+#[post("/measure/create", format = "json", data = "<measurement>")]
+fn create(conn: MyDatabase, measurement: Json<NewMeasurement>) {
+    measurement.create(&conn);
 }
 
 fn main() {
     rocket::ignite()
         .attach(MyDatabase::fairing())
-        .mount("/", routes![hello, fuel, measure])
+        .mount("/", routes![all, create])
         .launch();
 }
