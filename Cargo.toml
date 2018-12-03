@@ -1,5 +1,5 @@
 [package]
-name = "rocket_crud"
+name = "diesel_rocket"
 version = "0.1.0"
 authors = ["Ralf Northman <ralf.northman@bredband.net>"]
 

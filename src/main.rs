@@ -5,9 +5,9 @@ extern crate serde_json;
 #[macro_use] extern crate rocket;
 #[macro_use] extern crate rocket_contrib;
 
-extern crate rocket_crud;
+extern crate diesel_rocket;
 
-use self::rocket_crud::*;
+use self::diesel_rocket::*;
 use self::models::*;
 use rocket_contrib::databases::diesel;
 use rocket_contrib::json::Json;
