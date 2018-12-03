@@ -1,16 +1,17 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
+extern crate serde;
+extern crate serde_json;
 #[macro_use] extern crate rocket;
 #[macro_use] extern crate rocket_contrib;
 
 extern crate rocket_crud;
 
-use self::diesel::prelude::*;
 use self::rocket_crud::*;
 use self::models::*;
 use rocket::http::RawStr;
-use rocket::Data;
 use rocket_contrib::databases::diesel;
+use rocket_contrib::json::Json;
 
 #[database("my_db")]
 struct MyDatabase(diesel::MysqlConnection);
@@ -26,13 +27,9 @@ fn fuel() -> &'static str {
 }
 
 #[get("/measure")]
-fn measure(conn: MyDatabase) -> String {
-    let v = load_from_db(&conn);
-    format!("{:?}", v)
-}
-
-fn load_from_db(conn: &diesel::MysqlConnection) -> Vec<Measurement> {
-    Measurement::all(&conn)
+fn measure(conn: MyDatabase) -> Json<Vec<Measurement>> {
+    let v = Measurement::all(&conn);
+    Json(v)
 }
 
 fn main() {

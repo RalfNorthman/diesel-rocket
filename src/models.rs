@@ -2,7 +2,7 @@ use super::schema::measurements;
 use super::schema::measurements::dsl::*;
 use diesel::prelude::*;
 
-#[derive(Queryable, Debug)]
+#[derive(Queryable, Debug, Serialize)]
 pub struct Measurement {
     pub id: u64,
     pub temperature: f64,
