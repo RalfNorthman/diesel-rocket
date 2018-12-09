@@ -24,6 +24,12 @@ impl Measurement {
     pub fn all(conn: &MysqlConnection) -> Vec<Measurement> {
         measurements.load::<Measurement>(conn).unwrap()
     }
+
+    pub fn one(conn: &MysqlConnection, id_arg: u64) -> Vec<Measurement> {
+        measurements
+            .filter(id.eq(id_arg))
+            .load::<Measurement>(conn).unwrap()
+    }
 }
 
 impl NewMeasurement {

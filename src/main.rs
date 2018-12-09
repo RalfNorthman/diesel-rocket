@@ -15,13 +15,19 @@ use rocket_contrib::json::Json;
 #[database("my_db")]
 struct MyDatabase(diesel::MysqlConnection);
 
-#[get("/measure/all")]
+#[get("/measurements")]
 fn all(conn: MyDatabase) -> Json<Vec<Measurement>> {
     let v = Measurement::all(&conn);
     Json(v)
 }
 
-#[post("/measure/create", format = "json", data = "<measurement>")]
+#[get("/measurements/<id>")]
+fn id(conn: MyDatabase, id: u64) -> Json<Vec<Measurement>> {
+    let m = Measurement::one(&conn, id);
+    Json(m)
+}
+
+#[post("/measurements", format = "json", data = "<measurement>")]
 fn create(conn: MyDatabase, measurement: Json<NewMeasurement>) {
     measurement.create(&conn);
 }
@@ -29,6 +35,6 @@ fn create(conn: MyDatabase, measurement: Json<NewMeasurement>) {
 fn main() {
     rocket::ignite()
         .attach(MyDatabase::fairing())
-        .mount("/", routes![all, create])
+        .mount("/", routes![all, create, id])
         .launch();
 }
