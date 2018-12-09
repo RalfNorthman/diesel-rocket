@@ -1,0 +1,28 @@
+threads: 8
+base: 'http://localhost:8000'
+iterations: 5
+rampup: 2
+
+plan:
+  - name: Fetch all measurements
+    request:
+      url: /measurements
+
+  - name: Fetch some measurements
+    request:
+      url: /measurements/{{ item }}
+    with_items:
+      - 3
+      - 5
+      - 12
+      - 21
+
+  - name: Create some measurements
+    request:
+      url: /measurements
+      method: POST
+      body: '{ "temperature": 32.3, 
+               "humidity": 84.3, 
+               "pressure": 984.4 }'
+      headers:
+        Content-Type: application/json
