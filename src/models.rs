@@ -8,7 +8,7 @@ pub struct Measurement {
     pub temperature: f64,
     pub humidity: f64,
     pub pressure: f64,
-    pub comment: Option<String>,
+    pub comment: String,
 }
 
 #[derive(Insertable, Deserialize)]
@@ -17,7 +17,7 @@ pub struct NewMeasurement {
     pub temperature: f64,
     pub humidity: f64,
     pub pressure: f64,
-    pub comment: Option<String>,
+    pub comment: String,
 }
 
 impl Measurement {

@@ -4,6 +4,6 @@ table! {
         temperature -> Double,
         humidity -> Double,
         pressure -> Double,
-        comment -> Nullable<Tinytext>,
+        comment -> Tinytext,
     }
 }
