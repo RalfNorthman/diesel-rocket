@@ -11,6 +11,7 @@ use self::diesel_rocket::*;
 use self::models::*;
 use rocket_contrib::databases::diesel;
 use rocket_contrib::json::Json;
+use rocket_cors::{Error, CorsOptions};
 
 #[database("my_db")]
 struct MyDatabase(diesel::MysqlConnection);
@@ -32,9 +33,15 @@ fn create(conn: MyDatabase, measurement: Json<NewMeasurement>) {
     measurement.create(&conn);
 }
 
-fn main() {
+fn main() -> Result<(), Error> {
+
+    let cors = CorsOptions::default().to_cors()?; 
+
     rocket::ignite()
         .attach(MyDatabase::fairing())
         .mount("/", routes![all, create, id])
+        .attach(cors)
         .launch();
+
+    Ok(())
 }
