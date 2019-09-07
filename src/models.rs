@@ -25,16 +25,19 @@ impl Measurement {
         measurements.load::<Measurement>(conn).unwrap()
     }
 
-    pub fn one(conn: &MysqlConnection, id_arg: u64) -> Vec<Measurement> {
+    pub fn one(
+        conn: &MysqlConnection,
+        id_arg: u64,
+    ) -> Vec<Measurement> {
         measurements
             .filter(id.eq(id_arg))
-            .load::<Measurement>(conn).unwrap()
+            .load::<Measurement>(conn)
+            .unwrap()
     }
 }
 
 impl NewMeasurement {
     pub fn create(&self, conn: &MysqlConnection) {
-
         diesel::insert_into(measurements)
             .values(self)
             .execute(conn)
