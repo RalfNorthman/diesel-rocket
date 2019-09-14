@@ -13,11 +13,11 @@ pub struct Measurement {
 
 #[derive(Insertable, Deserialize)]
 #[table_name = "measurements"]
-pub struct NewMeasurement {
+pub struct NewMeasurement<'a> {
     pub temperature: f64,
     pub humidity: f64,
     pub pressure: f64,
-    pub comment: String,
+    pub comment: Option<&'a str>,
 }
 
 impl Measurement {
@@ -30,15 +30,12 @@ impl Measurement {
     pub fn one(
         conn: &MysqlConnection,
         id_arg: u64,
-    ) -> Vec<Measurement> {
-        measurements
-            .filter(id.eq(id_arg))
-            .load::<Measurement>(conn)
-            .unwrap()
+    ) -> QueryResult<Measurement> {
+        measurements.find(id_arg).first(conn)
     }
 }
 
-impl NewMeasurement {
+impl NewMeasurement<'_> {
     pub fn create(
         &self,
         conn: &MysqlConnection,

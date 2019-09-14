@@ -38,9 +38,9 @@ fn all(conn: MyDatabase) -> RocketResult<Vec<Measurement>> {
 }
 
 #[get("/measurements/<id>")]
-fn id(conn: MyDatabase, id: u64) -> Json<Vec<Measurement>> {
+fn id(conn: MyDatabase, id: u64) -> RocketResult<Measurement> {
     let v = Measurement::one(&conn, id);
-    Json(v)
+    out(v)
 }
 
 #[post("/measurements", format = "json", data = "<measurement>")]
