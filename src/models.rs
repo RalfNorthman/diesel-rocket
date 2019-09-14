@@ -9,6 +9,7 @@ pub struct Measurement {
     pub humidity: f64,
     pub pressure: f64,
     pub comment: String,
+    pub my_ref: Option<u64>,
 }
 
 #[derive(Insertable, Deserialize)]
@@ -18,6 +19,7 @@ pub struct NewMeasurement<'a> {
     pub humidity: f64,
     pub pressure: f64,
     pub comment: Option<&'a str>,
+    pub my_ref: Option<u64>,
 }
 
 impl Measurement {

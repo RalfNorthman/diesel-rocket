@@ -1,3 +1,5 @@
 http :8000/measurements temperature:=23.99 humidity:=95.3 pressure:=1034.3 comment='Köttfärssås.'
 
 http :8000/measurements temperature:=23.99 humidity:=95.3 pressure:=1034.3
+
+http :8000/measurements temperature:=23.99 humidity:=95.3 pressure:=1034.3 my_ref:=42
