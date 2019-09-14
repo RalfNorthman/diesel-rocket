@@ -21,8 +21,10 @@ pub struct NewMeasurement {
 }
 
 impl Measurement {
-    pub fn all(conn: &MysqlConnection) -> Vec<Measurement> {
-        measurements.load::<Measurement>(conn).unwrap()
+    pub fn all(
+        conn: &MysqlConnection,
+    ) -> QueryResult<Vec<Measurement>> {
+        measurements.load::<Measurement>(conn)
     }
 
     pub fn one(
@@ -37,10 +39,10 @@ impl Measurement {
 }
 
 impl NewMeasurement {
-    pub fn create(&self, conn: &MysqlConnection) {
-        diesel::insert_into(measurements)
-            .values(self)
-            .execute(conn)
-            .expect("insert failed");
+    pub fn create(
+        &self,
+        conn: &MysqlConnection,
+    ) -> QueryResult<usize> {
+        diesel::insert_into(measurements).values(self).execute(conn)
     }
 }
