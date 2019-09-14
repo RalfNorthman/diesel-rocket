@@ -22,7 +22,7 @@ fn out<T>(from: QueryResult<T>) -> RocketResult<T> {
     match from {
         Ok(payload) => Json(Ok(payload)),
         Err(error) => {
-            let err = format!("{:?}", error);
+            let err = format!("{}", error);
             Json(Err(err))
         }
     }
