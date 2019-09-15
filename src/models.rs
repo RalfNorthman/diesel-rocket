@@ -1,6 +1,8 @@
 use super::schema::measurements;
 use super::schema::measurements::dsl::*;
+use diesel::mysql::types::Unsigned;
 use diesel::prelude::*;
+use diesel::sql_types::BigInt;
 
 #[derive(Queryable, Debug, Serialize)]
 pub struct Measurement {
@@ -37,11 +39,19 @@ impl Measurement {
     }
 }
 
+no_arg_sql_function!(last_insert_id, Unsigned<BigInt>);
+
+fn last_id(conn: &MysqlConnection) -> u64 {
+    diesel::select(last_insert_id).first(conn).unwrap()
+}
+
 impl NewMeasurement<'_> {
-    pub fn create(
-        &self,
-        conn: &MysqlConnection,
-    ) -> QueryResult<usize> {
-        diesel::insert_into(measurements).values(self).execute(conn)
+    pub fn create(&self, conn: &MysqlConnection) -> QueryResult<u64> {
+        conn.transaction(|| {
+            diesel::insert_into(measurements)
+                .values(self)
+                .execute(conn)?;
+            Ok(last_id(conn))
+        })
     }
 }

@@ -47,7 +47,7 @@ fn id(conn: MyDatabase, id: u64) -> RocketResult<Measurement> {
 fn create(
     conn: MyDatabase,
     measurement: Json<NewMeasurement>,
-) -> RocketResult<usize> {
+) -> RocketResult<u64> {
     let v = measurement.create(&conn);
     out(v)
 }
