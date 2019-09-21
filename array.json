@@ -1,0 +1,17 @@
+{
+  "Ok": [
+    {
+        "temperature": 23.99,
+        "pressure": 1034.3,
+        "humidity": 95.3,
+        "comment": "First is fine."
+    },
+    {
+        "temperature": 23.99,
+        "humidity": 95.3,
+        "pressure": 1034.3,
+        "comment": "Second fails",
+        "my_ref": 42
+    }
+  ]
+}

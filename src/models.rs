@@ -55,3 +55,21 @@ impl NewMeasurement<'_> {
         })
     }
 }
+
+pub fn db_create_two(
+    conn: &MysqlConnection,
+    items: [NewMeasurement; 2],
+) -> QueryResult<(u64, u64)> {
+    let a = &items[0];
+    let b = &items[1];
+
+    conn.transaction(|| {
+        diesel::insert_into(measurements).values(a).execute(conn)?;
+        let a_id = last_id(conn);
+
+        diesel::insert_into(measurements).values(b).execute(conn)?;
+        let b_id = last_id(conn);
+
+        Ok((a_id, b_id))
+    })
+}
