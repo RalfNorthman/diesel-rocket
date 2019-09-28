@@ -42,7 +42,7 @@ impl From<DieselError> for CustomError {
 }
 
 trait Returnable<T, E, F> {
-    fn out(self) -> Result<Json<T>, F>;
+    fn output(self) -> Result<Json<T>, F>;
 }
 
 use serde::Serialize;
@@ -52,7 +52,7 @@ where
     T: Serialize,
     F: From<E>,
 {
-    fn out(self) -> Result<Json<T>, F> {
+    fn output(self) -> Result<Json<T>, F> {
         Ok(Json(self?))
     }
 }
@@ -62,13 +62,12 @@ struct MyDatabase(MysqlConnection);
 
 #[get("/measurements")]
 fn all(conn: MyDatabase) -> CustomResult<Vec<Measurement>> {
-    Measurement::all(&conn).out()
+    Measurement::all(&conn).output()
 }
 
 #[get("/measurements/<id>")]
 fn id(conn: MyDatabase, id: u64) -> CustomResult<Measurement> {
-    let v = Measurement::one(&conn, id)?;
-    Ok(Json(v))
+    Measurement::one(&conn, id).output()
 }
 
 #[post("/measurements", format = "json", data = "<measurement>")]
@@ -77,8 +76,7 @@ fn create(
     measurement: JsonResult<NewMeasurement>,
 ) -> CustomResult<u64> {
     let insert = measurement?;
-    let last_id = insert.create(&conn)?;
-    Ok(Json(last_id))
+    insert.create(&conn).output()
 }
 
 fn main() -> Result<(), Error> {
