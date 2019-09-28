@@ -21,10 +21,10 @@ type CustomResult<T> = Result<Json<T>, CustomError>;
 
 #[derive(Debug, Responder)]
 enum CustomError {
-    #[response(status = 500, content_type = "plain")]
-    DbError(String),
     #[response(status = 422, content_type = "plain")]
     ApiError(String),
+    #[response(status = 500, content_type = "plain")]
+    DbError(String),
 }
 
 impl<'a> From<JsonError<'a>> for CustomError {
@@ -41,19 +41,13 @@ impl From<DieselError> for CustomError {
     }
 }
 
-trait Returnable<T, E, F> {
-    fn output(self) -> Result<Json<T>, F>;
+trait Returnable<T> {
+    fn output(self) -> CustomResult<T>;
 }
 
-use serde::Serialize;
-
-impl<T, E, F> Returnable<T, E, F> for Result<T, E>
-where
-    T: Serialize,
-    F: From<E>,
-{
-    fn output(self) -> Result<Json<T>, F> {
-        Ok(Json(self?))
+impl<T> Returnable<T> for T {
+    fn output(self) -> CustomResult<T> {
+        Ok(Json(self))
     }
 }
 
@@ -62,12 +56,12 @@ struct MyDatabase(MysqlConnection);
 
 #[get("/measurements")]
 fn all(conn: MyDatabase) -> CustomResult<Vec<Measurement>> {
-    Measurement::all(&conn).output()
+    Measurement::all(&conn)?.output()
 }
 
 #[get("/measurements/<id>")]
 fn id(conn: MyDatabase, id: u64) -> CustomResult<Measurement> {
-    Measurement::one(&conn, id).output()
+    Measurement::one(&conn, id)?.output()
 }
 
 #[post("/measurements", format = "json", data = "<measurement>")]
@@ -75,8 +69,7 @@ fn create(
     conn: MyDatabase,
     measurement: JsonResult<NewMeasurement>,
 ) -> CustomResult<u64> {
-    let insert = measurement?;
-    insert.create(&conn).output()
+    measurement?.create(&conn)?.output()
 }
 
 fn main() -> Result<(), Error> {
