@@ -16,8 +16,8 @@ use rocket_contrib::databases::diesel::MysqlConnection;
 use rocket_contrib::json::{Json, JsonError};
 use rocket_cors::{CorsOptions, Error};
 
-type InResult<'a, T> = Result<Json<T>, JsonError<'a>>;
-type OutResult<T> = Result<Json<T>, CustomError>;
+type JsonResult<'a, T> = Result<Json<T>, JsonError<'a>>;
+type CustomResult<T> = Result<Json<T>, CustomError>;
 
 #[derive(Debug, Responder)]
 enum CustomError {
@@ -41,17 +41,32 @@ impl From<DieselError> for CustomError {
     }
 }
 
+trait Returnable<T, E, F> {
+    fn out(self) -> Result<Json<T>, F>;
+}
+
+use serde::Serialize;
+
+impl<T, E, F> Returnable<T, E, F> for Result<T, E>
+where
+    T: Serialize,
+    F: From<E>,
+{
+    fn out(self) -> Result<Json<T>, F> {
+        Ok(Json(self?))
+    }
+}
+
 #[database("my_db")]
 struct MyDatabase(MysqlConnection);
 
 #[get("/measurements")]
-fn all(conn: MyDatabase) -> OutResult<Vec<Measurement>> {
-    let v = Measurement::all(&conn)?;
-    Ok(Json(v))
+fn all(conn: MyDatabase) -> CustomResult<Vec<Measurement>> {
+    Measurement::all(&conn).out()
 }
 
 #[get("/measurements/<id>")]
-fn id(conn: MyDatabase, id: u64) -> OutResult<Measurement> {
+fn id(conn: MyDatabase, id: u64) -> CustomResult<Measurement> {
     let v = Measurement::one(&conn, id)?;
     Ok(Json(v))
 }
@@ -59,8 +74,8 @@ fn id(conn: MyDatabase, id: u64) -> OutResult<Measurement> {
 #[post("/measurements", format = "json", data = "<measurement>")]
 fn create(
     conn: MyDatabase,
-    measurement: InResult<NewMeasurement>,
-) -> OutResult<u64> {
+    measurement: JsonResult<NewMeasurement>,
+) -> CustomResult<u64> {
     let insert = measurement?;
     let last_id = insert.create(&conn)?;
     Ok(Json(last_id))
