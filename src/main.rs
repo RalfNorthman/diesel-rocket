@@ -29,7 +29,7 @@ enum CustomError {
 
 impl<'a> From<JsonError<'a>> for CustomError {
     fn from(error: JsonError<'a>) -> Self {
-        let s = format!("{:?}", error).replace("\\", "");
+        let s = format!("{:?}", error).replace('\\', "");
         CustomError::ApiError(s)
     }
 }
